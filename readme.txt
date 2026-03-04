@@ -4,7 +4,7 @@ Tags: post order, drag and drop, menu order, custom post type, reorder
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,9 @@ Add `'wjpo_no_sort' => 1` to your `WP_Query` arguments.
 
 == Changelog ==
 
+= 1.3.2 =
+* Fix: frontend ordering now applies inside Divi's AJAX-filtered grids (is_admin() is true for admin-ajax.php; plugin now correctly allows front-end AJAX queries through)
+
 = 1.3.1 =
 * Fix: frontend ordering now works with Divi Blog/Portfolio modules and other page builder queries that explicitly set orderby
 
@@ -61,6 +64,9 @@ Add `'wjpo_no_sort' => 1` to your `WP_Query` arguments.
 * Initial public release
 
 == Upgrade Notice ==
+
+= 1.3.2 =
+Fix for Divi filterable grids: custom post order now applies correctly when Divi loads posts via AJAX.
 
 = 1.3.1 =
 Fix for sites using Divi: custom post order now applies correctly in Blog and Portfolio modules.

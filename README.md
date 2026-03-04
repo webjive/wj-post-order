@@ -96,6 +96,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Changelog
 
+### Version 1.3.2
+- Fix: frontend ordering now applies inside Divi's AJAX-filtered grids/modules (previously `is_admin()` returned `true` for `admin-ajax.php` requests, causing the hook to skip Divi's filterable module queries entirely)
+
 ### Version 1.3.1
 - Fix: frontend ordering now applies to Divi Blog/Portfolio modules and other page builder queries that pass an explicit `orderby` parameter (previously the plugin skipped these queries)
 
