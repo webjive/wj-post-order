@@ -95,6 +95,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Changelog
 
+### Version 1.3.0
+- Add "Apply Custom Post Order" checkbox to nav menu items (`Appearance > Menus`)
+- Checkbox enables `menu_order` ordering per post type archive, independent of the global toggle
+
 ### Version 1.2.4
 - Initial public release
 - Drag-and-drop reorder screen for Posts and CPTs

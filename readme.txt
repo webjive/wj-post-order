@@ -4,7 +4,7 @@ Tags: post order, drag and drop, menu order, custom post type, reorder
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.4
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,10 +50,17 @@ Add `'wjpo_no_sort' => 1` to your `WP_Query` arguments.
 
 == Changelog ==
 
+= 1.3.0 =
+* Add "Apply Custom Post Order" checkbox to nav menu items (Appearance > Menus)
+* Nav menu item checkbox enables ordering per post type archive, independent of the global toggle
+
 = 1.2.4 =
 * Initial public release
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+New: per-menu-item checkbox to enable custom post ordering on post type archives.
 
 = 1.2.4 =
 Initial public release.

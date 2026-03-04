@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WJ Post Order (Drag & Drop)
  * Description: Drag-and-drop ordering for Posts (and selected CPTs). Saves to menu_order and applies that order on the frontend—including Divi/secondary queries—unless a query explicitly sets its own order.
- * Version: 1.2.4
+ * Version: 1.3.0
  * Author: WebJIVE
  * License: GPLv2 or later
  * Text Domain: wj-post-order
@@ -21,6 +21,10 @@ final class WJ_Post_Order {
         add_action('admin_menu',               [$this, 'register_admin_pages']);
         add_action('admin_enqueue_scripts',    [$this, 'enqueue_admin']);
         add_action('wp_ajax_wjpo_save_order',  [$this, 'ajax_save_order']);
+
+        // Nav menu item checkbox
+        add_action('wp_nav_menu_item_custom_fields', [$this, 'menu_item_field'], 10, 4);
+        add_action('wp_update_nav_menu_item',        [$this, 'save_menu_item_field'], 10, 3);
 
         // Frontend: respect menu_order for ALL queries (main + secondary like Divi), unless orderby is explicitly set.
         add_action('pre_get_posts',            [$this, 'apply_all_frontend_order'], 999);
@@ -406,6 +410,59 @@ JS;
         }
     }
 
+    /* -------------------- Nav Menu Item Field -------------------- */
+
+    public function menu_item_field($item_id, $item, $depth, $args){
+        $checked = get_post_meta($item_id, '_wjpo_apply_order', true);
+        ?>
+        <p class="field-wjpo-apply-order description description-wide">
+            <label for="edit-menu-item-wjpo-apply-order-<?php echo esc_attr($item_id); ?>">
+                <input type="checkbox"
+                       id="edit-menu-item-wjpo-apply-order-<?php echo esc_attr($item_id); ?>"
+                       name="menu-item-wjpo-apply-order[<?php echo esc_attr($item_id); ?>]"
+                       value="1"
+                       <?php checked('1', $checked); ?>>
+                <?php esc_html_e('Apply Custom Post Order', 'wj-post-order'); ?>
+            </label>
+        </p>
+        <?php
+    }
+
+    public function save_menu_item_field($menu_id, $menu_item_db_id, $args){
+        if (!current_user_can('edit_theme_options')) return;
+        $val = isset($_POST['menu-item-wjpo-apply-order'][$menu_item_db_id]) ? '1' : '0';
+        update_post_meta($menu_item_db_id, '_wjpo_apply_order', $val);
+    }
+
+    /**
+     * Returns post types that have at least one nav menu item with 'Apply Custom Post Order' checked.
+     * Result is cached per request.
+     */
+    private function get_menu_ordered_types(){
+        static $types = null;
+        if ($types !== null) return $types;
+
+        $types    = [];
+        $item_ids = get_posts([
+            'post_type'      => 'nav_menu_item',
+            'meta_key'       => '_wjpo_apply_order',
+            'meta_value'     => '1',
+            'posts_per_page' => -1,
+            'post_status'    => 'publish',
+            'fields'         => 'ids',
+        ]);
+
+        foreach ($item_ids as $item_id) {
+            $item = wp_setup_nav_menu_item(get_post($item_id));
+            if ($item && $item->type === 'post_type_archive') {
+                $types[] = $item->object;
+            }
+        }
+
+        $types = array_unique($types);
+        return $types;
+    }
+
     /* -------------------- Query Ordering -------------------- */
 
     /**
@@ -415,25 +472,23 @@ JS;
     public function apply_all_frontend_order($q){
         if (is_admin() || !($q instanceof WP_Query)) return;
 
-        $o = $this->opts();
-        if (empty($o['apply_frontend'])) return;
-
         // Allow opt-out per query: set 'wjpo_no_sort' => 1
         if ((int) $q->get('wjpo_no_sort') === 1) return;
 
         // Respect explicit orderby set by the theme/module
         if ($q->get('orderby')) return;
 
-        // Only target enabled post types
-        $pt = $q->get('post_type');
-        if (empty($pt)) {
-            $pt = 'post';
-        }
-        // Normalize to array
+        $pt  = $q->get('post_type') ?: 'post';
         $pts = (array) $pt;
-        $enabled = $this->enabled_types();
-        $applies = count(array_intersect($pts, $enabled)) > 0;
-        if (!$applies) return;
+
+        // Path 1: global auto-apply setting
+        $o          = $this->opts();
+        $via_global = !empty($o['apply_frontend']) && count(array_intersect($pts, $this->enabled_types())) > 0;
+
+        // Path 2: a nav menu item for this post type archive has "Apply Custom Post Order" checked
+        $via_menu = count(array_intersect($pts, $this->get_menu_ordered_types())) > 0;
+
+        if (!$via_global && !$via_menu) return;
 
         $q->set('orderby', ['menu_order' => 'ASC', 'date' => 'DESC']);
         $q->set('order', 'ASC');
