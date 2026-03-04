@@ -113,7 +113,6 @@ The hook fires at `pre_get_posts` priority 999 on all frontend `WP_Query` instan
 **The hook does nothing if any of these are true:**
 1. The query is in admin context (`is_admin()`).
 2. The query sets `'wjpo_no_sort' => 1` (per-query opt-out).
-3. The query already has an explicit `orderby` set.
 
 **The hook applies `menu_order ASC, date DESC` if either path is active:**
 - **Path 1 (global)**: "Auto-apply on Frontend" setting is on AND the query's post type is in `enabled_types()`.

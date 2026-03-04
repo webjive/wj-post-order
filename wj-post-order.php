@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WJ Post Order (Drag & Drop)
  * Description: Drag-and-drop ordering for Posts (and selected CPTs). Saves to menu_order and applies that order on the frontend—including Divi/secondary queries—unless a query explicitly sets its own order.
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: WebJIVE
  * License: GPLv2 or later
  * Text Domain: wj-post-order
@@ -467,16 +467,18 @@ JS;
 
     /**
      * Apply menu_order to ALL frontend queries (main + secondary, e.g., Divi modules)
-     * unless the query explicitly sets its own 'orderby' or the site owner disables it via 'wjpo_no_sort' => 1.
+     * unless the site owner disables it via 'wjpo_no_sort' => 1.
+     *
+     * Note: we intentionally override an explicit orderby when the post type is managed
+     * by this plugin. Page builders like Divi pass orderby=>'date' in their module queries,
+     * which is just the WP default—not a deliberate override. Use 'wjpo_no_sort' => 1 on
+     * any query that genuinely needs a different order.
      */
     public function apply_all_frontend_order($q){
         if (is_admin() || !($q instanceof WP_Query)) return;
 
         // Allow opt-out per query: set 'wjpo_no_sort' => 1
         if ((int) $q->get('wjpo_no_sort') === 1) return;
-
-        // Respect explicit orderby set by the theme/module
-        if ($q->get('orderby')) return;
 
         $pt  = $q->get('post_type') ?: 'post';
         $pts = (array) $pt;

@@ -69,8 +69,9 @@ wj-post-order/
 The plugin hooks into `pre_get_posts` at priority 999. On the frontend it sets `orderby => ['menu_order' => 'ASC', 'date' => 'DESC']` on any query that:
 
 - Belongs to an enabled post type
-- Has not set its own `orderby`
 - Has not opted out via `wjpo_no_sort`
+
+Page builders like Divi pass `orderby => 'date'` in their module queries (the WordPress default). The plugin overrides this so that saved ordering is respected in Divi loops, Blog modules, and other secondary queries. Use `wjpo_no_sort => 1` on any query that genuinely needs a different sort order.
 
 Order is persisted via `wp_update_post()` with a direct database fallback (`$wpdb->update`) for environments that skip standard WP hooks (e.g., custom table prefixes).
 
@@ -94,6 +95,9 @@ WebJIVE — [https://www.web-jive.com](https://www.web-jive.com)
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Changelog
+
+### Version 1.3.1
+- Fix: frontend ordering now applies to Divi Blog/Portfolio modules and other page builder queries that pass an explicit `orderby` parameter (previously the plugin skipped these queries)
 
 ### Version 1.3.0
 - Add "Apply Custom Post Order" checkbox to nav menu items (`Appearance > Menus`)

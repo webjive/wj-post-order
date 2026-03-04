@@ -4,7 +4,7 @@ Tags: post order, drag and drop, menu order, custom post type, reorder
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,7 +38,7 @@ Yes. Go to **Settings > WJ Post Order** and check any public post type to enable
 
 = Will this affect my existing Divi loops? =
 
-Yes — if *Auto-apply on Frontend* is enabled, all queries for enabled post types will respect `menu_order` unless `orderby` is explicitly set by the query. You can opt out per-query by setting `'wjpo_no_sort' => 1`.
+Yes — if *Auto-apply on Frontend* is enabled, all queries for enabled post types will respect `menu_order`, including Divi Blog and Portfolio modules. Use `'wjpo_no_sort' => 1` to opt out of ordering on a specific query.
 
 = Does it use custom database tables? =
 
@@ -50,6 +50,9 @@ Add `'wjpo_no_sort' => 1` to your `WP_Query` arguments.
 
 == Changelog ==
 
+= 1.3.1 =
+* Fix: frontend ordering now works with Divi Blog/Portfolio modules and other page builder queries that explicitly set orderby
+
 = 1.3.0 =
 * Add "Apply Custom Post Order" checkbox to nav menu items (Appearance > Menus)
 * Nav menu item checkbox enables ordering per post type archive, independent of the global toggle
@@ -58,6 +61,9 @@ Add `'wjpo_no_sort' => 1` to your `WP_Query` arguments.
 * Initial public release
 
 == Upgrade Notice ==
+
+= 1.3.1 =
+Fix for sites using Divi: custom post order now applies correctly in Blog and Portfolio modules.
 
 = 1.3.0 =
 New: per-menu-item checkbox to enable custom post ordering on post type archives.
